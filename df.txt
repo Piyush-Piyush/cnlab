@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diffie-Hellman Key Exchange</title>
+    <script defer src="dh.js"></script>
+</head>
+<body>
+    <h1>Diffie-Hellman Key Exchange</h1>
+
+    <div>
+        <h2>Party A</h2>
+        <button onclick="generateKeys('A')">Generate Keys</button>
+        <p>Public Key: <span id="publicKeyA"></span></p>
+        <p>Private Key: <span id="privateKeyA"></span></p>
+    </div>
+
+    <div>
+        <h2>Party B</h2>
+        <button onclick="generateKeys('B')">Generate Keys</button>
+        <p>Public Key: <span id="publicKeyB"></span></p>
+        <p>Private Key: <span id="privateKeyB"></span></p>
+    </div>
+
+    <div>
+        <h2>Shared Secret</h2>
+        <button onclick="computeSharedSecret()">Compute Shared Secret</button>
+        <p>Shared Secret: <span id="sharedSecret"></span></p>
+    </div>
+</body>
+</html>
+
+
+const p = 23;  // A prime number
+const g = 5;   // A primitive root modulo p
+
+function generateKeys(party) {
+    const privateKey = Math.floor(Math.random() * (p - 2)) + 1;
+    const publicKey = Math.pow(g, privateKey) % p;
+
+    document.getElementById(`privateKey${party}`).textContent = privateKey;
+    document.getElementById(`publicKey${party}`).textContent = publicKey;
+
+    localStorage.setItem(`privateKey${party}`, privateKey);
+    localStorage.setItem(`publicKey${party}`, publicKey);
+}
+
+function computeSharedSecret() {
+    const privateKeyA = parseInt(localStorage.getItem('privateKeyA'));
+    const publicKeyB = parseInt(localStorage.getItem('publicKeyB'));
+    const sharedSecretA = Math.pow(publicKeyB, privateKeyA) % p;
+
+    const privateKeyB = parseInt(localStorage.getItem('privateKeyB'));
+    const publicKeyA = parseInt(localStorage.getItem('publicKeyA'));
+    const sharedSecretB = Math.pow(publicKeyA, privateKeyB) % p;
+
+    if (sharedSecretA === sharedSecretB) {
+        document.getElementById('sharedSecret').textContent = sharedSecretA;
+    } else {
+        document.getElementById('sharedSecret').textContent = "Error: Shared secrets do not match!";
+    }
+}
+
